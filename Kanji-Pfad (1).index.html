@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kanji-Pfad</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5fb;--card:#fff;--ink:#1d2144;--mute:#646890;--k:#4f46e5;--onk:#fff;--ok:#0e9f6e;--bad:#e11d48;--line:#e1e3f2;--tk:#e3e1ff;--tg:#d4f3e5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13152a;--card:#1d2040;--ink:#eceefc;--mute:#9da1c9;--k:#8b84ff;--onk:#13152a;--ok:#34d399;--bad:#fb7185;--line:#2c3060;--tk:#2c2f66;--tg:#14392f}}
+:root[data-theme="dark"]{--bg:#13152a;--card:#1d2040;--ink:#eceefc;--mute:#9da1c9;--k:#8b84ff;--onk:#13152a;--ok:#34d399;--bad:#fb7185;--line:#2c3060;--tk:#2c2f66;--tg:#14392f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic",system-ui,sans-serif;line-height:1.5}
+main{max-width:480px;margin:0 auto;padding:20px}
+h1{font-size:2rem;font-weight:900;margin:8px 0 0}h2{margin:.2em 0}
+.sub{color:var(--mute);margin:.3em 0 1em}
+.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin-bottom:20px}.bar i{display:block;height:100%;background:var(--ok)}
+.row{display:flex;gap:12px;margin:16px 0}
+button{font:inherit;border:0;border-radius:16px;cursor:pointer;padding:14px 18px;font-weight:700}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--k);outline-offset:2px}
+.big{flex:1;background:var(--k);color:var(--onk);display:flex;flex-direction:column;align-items:center;padding:18px}
+.big b{font-size:2.2rem;line-height:1}.big.alt{background:var(--ok);color:#fff}
+.big1{width:100%;background:var(--k);color:var(--onk)}.row .big1{flex:2}
+.ghost{flex:1;background:var(--line);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.t{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--tk)}
+.t span{font-size:1.7rem;font-weight:700}.t small{font-size:.7rem;color:var(--mute)}
+.t.sx{background:var(--line);color:var(--mute)}.t.s5,.t.s6,.t.s7,.t.s8{background:var(--tg)}
+.card{background:var(--card);border-radius:24px;padding:24px;text-align:center;border:2px solid var(--line)}
+.card.ok{border-color:var(--ok)}.card.bad{border-color:var(--bad)}
+.kanji{font-size:6rem;font-weight:900;line-height:1.1;color:var(--k)}
+.hint{color:var(--mute);text-align:left}.q{font-weight:700;margin:.6em 0}
+input{width:100%;box-sizing:border-box;font:inherit;font-size:1.2rem;text-align:center;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);margin-bottom:10px}
+.lv{margin:1.4em 0 .5em;font-size:1.1rem}
+#f{min-height:1.6em;font-weight:700}.card.ok #f{color:var(--ok)}.card.bad #f{color:var(--bad)}
+</style></head>
+<body><main id="app"></main>
+<script>
+const D=[
+["一","いち","ichi",["eins","1"],"Ein einzelner Strich, wie die Zahl 1 auf einem Strichblatt."],
+["二","に","ni",["zwei","2"],"Zwei Striche übereinander, zwei Nudeln im Napf (ni)."],
+["三","さん","san",["drei","3"],"Drei Striche, drei Sonnenstrahlen (san wie Sonne)."],
+["人","ひと","hito",["mensch","person"],"Eine Person, die mit gespreizten Beinen steht."],
+["大","だい","dai",["groß","gross"],"Ein Mensch breitet die Arme aus: so groß! Dai wie „die Größe“."],
+["小","しょう","sho",["klein"],"Drei kleine Tropfen: ganz klein."],
+["山","やま","yama",["berg"],"Drei Gipfel, der mittlere ist der höchste."],
+["川","かわ","kawa",["fluss"],"Drei Wasserlinien, die nach unten fließen."],
+["日","にち","nichi",["tag","sonne"],"Ein Fenster, durch das die Sonne scheint."],
+["月","つき","tsuki",["mond","monat"],"Eine schmale Mondsichel mit zwei Wolkenstreifen."],
+["火","か","ka",["feuer"],"Ein Lagerfeuer mit zwei Funken. Ka wie „kalt? Nicht hier!“"],
+["水","みず","mizu",["wasser"],"Ein Wasserstrahl, der in alle Richtungen spritzt."],
+['右','みぎ','migi',['rechts'],'Ein Mund unter einer Hand: gegessen wird meist mit rechts.'],
+['雨','あめ','ame',['regen'],'Ein Fenster, aus dem Tropfen fallen.'],
+['円','えん','en',['yen','kreis'],'Eine Münze im Rahmen. En wie Yen.'],
+['王','おう','ou',['könig'],'Drei Ebenen, vom Stab verbunden: Himmel, Mensch, Erde.'],
+['音','おと','oto',['geräusch','klang','ton'],'Unter einem Stand tönt ein Klang.'],
+['下','した','shita',['unten','unter'],'Der Strich liegt oben, der Punkt hängt darunter.'],
+['花','はな','hana',['blume'],'Gras oben, darunter verwandelt sich etwas: es blüht.'],
+['貝','かい','kai',['muschel'],'Eine Muschel mit zwei Beinchen.'],
+['学','がく','gaku',['lernen','schule'],'Ein Kind unter dem Dach lernt.'],
+['気','き','ki',['energie','geist','luft'],'Dampf steigt aus einem Topf: Ki, Lebensenergie.'],
+['九','きゅう','kyuu',['neun','9'],'Wie die Ziffer 9 mit Haken.'],
+['休','やすむ','yasumu',['ausruhen','pause'],'Ein Mensch lehnt sich an einen Baum: Pause.'],
+['玉','たま','tama',['kugel','juwel'],'Ein König mit einem Punkt: sein Juwel.'],
+['金','きん','kin',['gold','geld'],'Unter einem Dach liegen glänzende Goldstücke.'],
+['空','そら','sora',['himmel','leer'],'Ein Dach mit Öffnung: leerer, weiter Himmel.'],
+['犬','いぬ','inu',['hund'],'Ein großer Mensch mit einem Ohr-Punkt: der Hund.'],
+['見','みる','miru',['sehen','anschauen'],'Ein Auge auf zwei Beinen: hingehen und schauen.'],
+['五','ご','go',['fünf','5'],'Fünf Finger. Go, zähl bis fünf!'],
+['口','くち','kuchi',['mund'],'Ein offener, viereckiger Mund.'],
+['校','こう','kou',['schule'],'Ein Baum und Kreuzungen: in der Schule wächst man.'],
+['左','ひだり','hidari',['links'],'Hand und Lineal: links hält man das Lineal.'],
+['子','こ','ko',['kind'],'Ein Kind mit ausgestreckten Armen.'],
+['四','よん','yon',['vier','4'],'Ein Fenster mit vier Seiten.'],
+['糸','いと','ito',['faden'],'Ein verdrillter Faden.'],
+['字','じ','ji',['schriftzeichen','buchstabe'],'Ein Kind unter dem Dach lernt die Zeichen.'],
+['耳','みみ','mimi',['ohr'],'Eine Ohrmuschel.'],
+['七','なな','nana',['sieben','7'],'Wie eine Sieben mit Haken.'],
+['車','くるま','kuruma',['auto','wagen'],'Ein Wagen von oben: Achse und zwei Räder.'],
+['手','て','te',['hand'],'Eine Hand mit Fingern und Handgelenk.'],
+['十','じゅう','juu',['zehn','10'],'Ein Kreuz steht für zehn.'],
+['出','でる','deru',['herausgehen','verlassen'],'Ein Berg über dem anderen: man geht hinaus.'],
+['女','おんな','onna',['frau'],'Eine kniende Frau.'],
+['上','うえ','ue',['oben','über'],'Der Strich liegt unten, der Punkt thront darüber.'],
+['森','もり','mori',['wald'],'Drei Bäume: ein richtiger Wald.'],
+['正','ただしい','tadashii',['richtig','korrekt'],'Ein Strich über dem Stopp: genau richtig.'],
+['生','せい','sei',['leben','geboren'],'Ein Keimling wächst aus dem Boden.'],
+['青','あお','ao',['blau','grün'],'Das blaue Licht der Dämmerung.'],
+['夕','ゆう','yuu',['abend'],'Ein halber Mond am Abend.'],
+['石','いし','ishi',['stein'],'Ein Fels, darunter liegt ein Stein.'],
+['赤','あか','aka',['rot'],'Ein Feuer färbt die Erde rot.'],
+['千','せん','sen',['tausend','1000'],'Ein Mensch mit einem Strich: tausend.'],
+['先','さき','saki',['voraus','vorher'],'Ein Mensch, der vorangeht.'],
+['早','はやい','hayai',['früh','schnell'],'Die Sonne über einem Kreuz: früh am Morgen.'],
+['草','くさ','kusa',['gras'],'Pflanzen oben, früh gewachsen.'],
+['足','あし','ashi',['fuß','bein'],'Knie, Bein und Fuß untereinander.'],
+['村','むら','mura',['dorf'],'Ein Baum und ein Maßstab: ein kleines Dorf.'],
+['男','おとこ','otoko',['mann'],'Ein Feld und Kraft: Männer arbeiten dort.'],
+['竹','たけ','take',['bambus'],'Zwei Bambusblätter.'],
+['中','なか','naka',['mitte','innen'],'Ein Pfeil trifft genau die Mitte.'],
+['虫','むし','mushi',['insekt','käfer'],'Ein Käfer mit Fühler.'],
+['町','まち','machi',['stadt','viertel'],'Ein Feld und ein Nagel: das Stadtviertel.'],
+['天','てん','ten',['himmel'],'Ein Mensch mit einem Strich darüber: der Himmel.'],
+['田','た','ta',['reisfeld','feld'],'Ein Reisfeld mit Deichen.'],
+['土','つち','tsuchi',['erde','boden'],'Ein Pflänzchen auf dem Boden.'],
+['入','にゅう','nyuu',['eintreten','hineingehen'],'Ein Pfeil, der hineinführt.'],
+['年','とし','toshi',['jahr'],'Jedes Jahr kommt eine neue Ernte.'],
+['白','しろ','shiro',['weiß','weiss'],'Die Sonne mit einem Strahl: weißes Licht.'],
+['八','はち','hachi',['acht','8'],'Zwei Striche gehen auseinander. Hachi!'],
+['百','ひゃく','hyaku',['hundert','100'],'Eine Eins über Weiß: hundert.'],
+['文','ぶん','bun',['text','satz'],'Gekreuzte Striche wie ein Schriftmuster.'],
+['木','き','ki',['baum','holz'],'Stamm, Äste und Wurzeln.'],
+['本','ほん','hon',['buch','ursprung'],'Ein Baum mit markierter Wurzel: der Ursprung.'],
+['名','な','na',['name'],'Abend und Mund: im Dunkeln ruft man den Namen.'],
+['目','め','me',['auge'],'Ein hochkant stehendes Auge.'],
+['立','たつ','tatsu',['stehen','aufstehen'],'Ein Mensch steht auf dem Boden.'],
+['力','ちから','chikara',['kraft'],'Ein angespannter Arm.'],
+['林','はやし','hayashi',['wäldchen','hain'],'Zwei Bäume: ein kleiner Wald.'],
+['六','ろく','roku',['sechs','6'],'Ein Dach auf zwei Beinen. Roku!']
+].map(([k,r,ro,m,h],i)=>({i,k,r,ro,m,h,l:Math.floor(i/10)+1}));
+const INT=[0,4,8,24,48,168,336,720,2880];
+let S={};try{S=JSON.parse(localStorage.getItem("kp")||"{}")}catch(e){S={}}
+const save=()=>{try{localStorage.setItem("kp",JSON.stringify(S))}catch(e){}};
+const $=document.getElementById("app"),now=()=>Date.now();
+const due=()=>D.filter(d=>S[d.i]&&S[d.i].due<=now()),fresh=()=>D.filter(d=>!S[d.i]&&d.l<=cur());
+const LV=Math.ceil(D.length/10),inL=l=>D.filter(d=>d.l==l),ready=l=>{const a=inL(l);return a.filter(d=>S[d.i]&&S[d.i].st>=4).length>=Math.ceil(a.length*.9)},cur=()=>{let l=1;while(l<LV&&ready(l))l++;return l};
+
+function home(){
+ const f=fresh().length,u=due().length,c=cur(),A=inL(c),g=A.filter(d=>S[d.i]&&S[d.i].st>=4).length;
+ $.innerHTML=`<h1>Kanji-Pfad</h1><p class="sub">Level ${c}: ${g} von ${A.length} Kanji sicher gelernt</p>
+ <div class="bar"><i style="width:${g/A.length*100}%"></i></div>
+ <div class="row"><button class="big" ${f?"":"disabled"} onclick="lesson()"><b>${f}</b>Lektionen</button>
+ <button class="big alt" ${u?"":"disabled"} onclick="review()"><b>${u}</b>Wiederholungen</button></div>
+ <div class="row"><button class="ghost" onclick="kana(0)">Hiragana üben</button><button class="ghost" onclick="kana(1)">Katakana üben</button></div>
+ ${Array.from({length:c},(_,x)=>c-x).map(l=>`<h2 class="lv">Level ${l}</h2><div class="grid">${inL(l).map(d=>{const s=S[d.i];return `<div class="t s${s?s.st:"x"}"><span>${d.k}</span><small>${s?d.m[0]:"?"}</small></div>`}).join("")}</div>`).join("")}${c<LV?`<p class="sub">Level ${c+1} wird freigeschaltet, sobald ${Math.ceil(A.length*.9)} Kanji aus Level ${c} sicher gelernt sind.</p>`:""}`;
+}
+
+function lesson(){
+ const L=fresh().slice(0,5);let n=0;
+ const show=()=>{const d=L[n];
+  $.innerHTML=`<p class="sub">Lektion ${n+1} von ${L.length}</p>
+  <div class="card"><div class="kanji">${d.k}</div><h2>${d.m[0][0].toUpperCase()+d.m[0].slice(1)}</h2>
+  <p><b>Lesung:</b> ${d.r} (${d.ro})</p><p class="hint">${d.h}</p></div>
+  <div class="row"><button class="ghost" id="b" ${n?"":"disabled"}>Zurück</button><button class="big1" id="nx">${n<L.length-1?"Weiter":"Fertig"}</button></div>`;
+  b.onclick=()=>{n--;show()};
+  nx.onclick=()=>{if(n<L.length-1){n++;show()}else{L.forEach(d=>S[d.i]={st:1,due:now()+INT[1]*36e5});save();home()}};
+ };show();
+}
+
+function review(){
+ const Q=[];due().forEach(d=>Q.push([d,"m"],[d,"r"]));
+ Q.sort(()=>Math.random()-.5);
+ const W={},T={},total=Q.length;let done=0;
+ const ask=()=>{
+  if(!Q.length){save();return home()}
+  const [d,t]=Q[0];let checked=false,ok=false;
+  $.innerHTML=`<p class="sub">${done} von ${total} beantwortet</p>
+  <div class="card" id="c"><div class="kanji">${d.k}</div><p class="q">${t=="m"?"Bedeutung":"Lesung"}</p>
+  <input id="a" autocomplete="off" autocapitalize="none" placeholder="${t=="m"?"Deutsch":"Hiragana oder Romaji"}"><div id="f"></div></div>
+  <div class="row"><button class="big1" id="go">Prüfen</button></div>`;
+  a.focus();
+  const go=()=>{
+   if(!checked){
+    const v=a.value.trim().toLowerCase();
+    ok=t=="m"?d.m.includes(v):(v==d.r||v==d.ro);
+    c.classList.add(ok?"ok":"bad");a.readOnly=true;checked=true;
+    f.textContent=ok?"Richtig!":"Richtig wäre: "+(t=="m"?d.m.join(" / "):d.r+" ("+d.ro+")");
+    go_.textContent="Weiter";
+   }else{
+    Q.shift();
+    if(ok){done++;T[d.i]=(T[d.i]||0)+1;
+     if(T[d.i]==2){const s=S[d.i];s.st=W[d.i]?Math.max(1,s.st-1):Math.min(8,s.st+1);s.due=now()+INT[s.st]*36e5}
+    }else{W[d.i]=1;Q.push([d,t])}
+    save();ask();
+   }
+  };
+  const go_=document.getElementById("go");
+  go_.onclick=go;a.onkeydown=e=>{if(e.key=="Enter")go()};
+ };ask();
+}
+let KS={};try{KS=JSON.parse(localStorage.getItem("kp_kana")||"{}")}catch(e){KS={}}
+const KH="あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん",
+KK="アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン",
+KR="a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n".split(" "),
+ALT={shi:"si",chi:"ti",tsu:"tu",fu:"hu",wo:"o"};
+function kana(t){
+ const C=[...(t?KK:KH)],B=KS[t]=KS[t]||{};
+ const keep=()=>{try{localStorage.setItem("kp_kana",JSON.stringify(KS))}catch(e){}};
+ $.innerHTML=`<h1>${t?"Katakana":"Hiragana"}</h1><p class="sub">Tabelle mit Aussprache in Romaji. Grün bedeutet sicher gelernt.</p>
+ <div class="grid">${C.map((c,i)=>`<div class="t s${B[i]>=3?5:B[i]>=1?1:"x"}"><span>${c}</span><small>${KR[i]}</small></div>`).join("")}</div>
+ <div class="row"><button class="ghost" id="bk">Zurück</button><button class="big1" id="st">Üben</button></div>`;
+ bk.onclick=home;
+ st.onclick=()=>{
+  const Q=C.map((c,i)=>i).sort((x,y)=>(B[x]||0)-(B[y]||0)+Math.random()-.5).slice(0,10);let done=0;
+  const ask=()=>{
+   if(!Q.length){keep();return kana(t)}
+   const i=Q[0];let chk=false,good=false;
+   $.innerHTML=`<p class="sub">${done} von 10 richtig</p><div class="card" id="c"><div class="kanji">${C[i]}</div><input id="a" autocomplete="off" autocapitalize="none" placeholder="Romaji"><div id="f"></div></div><div class="row"><button class="big1" id="go">Prüfen</button></div>`;
+   a.focus();
+   const go=()=>{
+    if(!chk){
+     const v=a.value.trim().toLowerCase();good=v==KR[i]||v==ALT[KR[i]];
+     c.classList.add(good?"ok":"bad");a.readOnly=true;chk=true;
+     f.textContent=good?"Richtig!":"Richtig wäre: "+KR[i];go_.textContent="Weiter";
+    }else{
+     Q.shift();B[i]=good?Math.min(5,(B[i]||0)+1):0;
+     if(good)done++;else Q.push(i);
+     keep();ask();
+    }
+   };
+   const go_=document.getElementById("go");
+   go_.onclick=go;a.onkeydown=e=>{if(e.key=="Enter")go()};
+  };ask();
+ };
+}
+home();
+</script></body></html>
